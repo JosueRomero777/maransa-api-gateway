@@ -23,6 +23,7 @@ export class ProxyService {
     body: any,
     headers: Record<string, string>,
     query: any,
+    req?: any,
   ): Promise<any> {
     try {
       // Get service URL from service discovery
@@ -44,8 +45,13 @@ export class ProxyService {
         timeout: 30000, // 30s timeout
       };
 
-      // Add body for POST, PUT, PATCH
-      if (['post', 'put', 'patch'].includes(method.toLowerCase()) && body) {
+      // Handle multipart form-data by forwarding raw request stream
+      const contentType = headers['content-type'] || '';
+      if (contentType.includes('multipart/form-data') && req) {
+        config.data = req;
+        // Keep the multipart content-type header with boundary
+      } else if (['post', 'put', 'patch'].includes(method.toLowerCase()) && body) {
+        // Add body for POST, PUT, PATCH (non-multipart)
         config.data = body;
       }
 

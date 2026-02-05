@@ -49,9 +49,13 @@ export class ProxyController {
       const headers = { ...req.headers };
       delete headers.host;
       delete headers.connection;
-      delete headers['content-length'];
+      // Keep content-length for multipart, axios will handle it
+      const contentType = headers['content-type'] || '';
+      if (!contentType.includes('multipart/form-data')) {
+        delete headers['content-length'];
+      }
 
-      // Forward request
+      // Forward request (pass req for multipart streaming)
       const result = await this.proxyService.forwardRequest(
         serviceName,
         targetPath,
@@ -59,6 +63,7 @@ export class ProxyController {
         req.body,
         headers as Record<string, string>,
         req.query,
+        contentType.includes('multipart/form-data') ? req : undefined,
       );
 
       // Return response
