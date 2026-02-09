@@ -87,8 +87,18 @@ export class ProxyService {
    * Map route prefix to service name
    */
   getServiceNameFromRoute(route: string): string {
-    // External microservices (always separate)
-    if (route.startsWith('/api/ai')) return 'ai-service';
+    // AI routes - Check if it should go to backend or AI service
+    if (route.startsWith('/api/ai/')) {
+      // Routes that go to backend (NestJS)
+      if (route.startsWith('/api/ai/predictions/') ||
+          route.startsWith('/api/ai/statistics/')) {
+        return process.env.BACKEND_MONOLITH_URL ? 'backend-monolith' : 'ai-backend-service';
+      }
+      // All other /api/ai/* routes go to Python AI service
+      return 'ai-service';
+    }
+    
+    // SRI service
     if (route.startsWith('/api/sri')) return 'sri-service';
 
     // Backend routes - check if using monolith or microservices
