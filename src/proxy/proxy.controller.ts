@@ -26,6 +26,15 @@ export class ProxyController {
   }
 
   /**
+   * AI/SRI Service routes - No authentication (external microservices)
+   */
+  @All(['ai/predict/*', 'ai/data/*', 'ai/models/*', 'ai/health', 'ai/analysis/*', 'sri/*'])
+  @ApiOperation({ summary: 'Public AI and SRI service endpoints' })
+  async externalServices(@Req() req: Request, @Res() res: Response) {
+    return this.forwardToService(req, res);
+  }
+
+  /**
    * Protected routes - Authentication required
    */
   @All('*')
