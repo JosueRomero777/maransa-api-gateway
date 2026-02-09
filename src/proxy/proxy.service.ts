@@ -43,6 +43,10 @@ export class ProxyService {
         },
         params: query,
         timeout: 30000, // 30s timeout
+        validateStatus: (status) => {
+          // Accept 2xx, 3xx (including 304) as valid responses
+          return status >= 200 && status < 400;
+        },
       };
 
       // Handle multipart form-data by forwarding raw request stream
