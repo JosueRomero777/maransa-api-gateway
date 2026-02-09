@@ -95,7 +95,8 @@ export class ProxyService {
     if (route.startsWith('/api/ai/')) {
       // Routes that go to backend (NestJS)
       if (route.startsWith('/api/ai/predictions/') ||
-          route.startsWith('/api/ai/statistics/')) {
+          route.startsWith('/api/ai/statistics/') ||
+          route.startsWith('/api/ai/predict/')) {
         return process.env.BACKEND_MONOLITH_URL ? 'backend-monolith' : 'ai-backend-service';
       }
       // All other /api/ai/* routes go to Python AI service
