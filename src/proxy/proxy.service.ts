@@ -139,9 +139,14 @@ export class ProxyService {
       return originalPath.replace('/api', '');
     }
 
-    // External services (AI, SRI) keep /api
-    if (serviceName === 'ai-service' || serviceName === 'sri-service') {
-      return originalPath; // Keep /api/ai, /api/sri
+    // AI service: remove /api/ai prefix (routes are like /data/*, /predict/*, etc.)
+    if (serviceName === 'ai-service') {
+      return originalPath.replace('/api/ai', '');
+    }
+
+    // SRI service: remove /api/sri prefix
+    if (serviceName === 'sri-service') {
+      return originalPath.replace('/api/sri', '');
     }
 
     // Microservices mode: remove /api prefix
