@@ -76,6 +76,22 @@ export class ProxyController {
       );
 
       // Return response
+      if (result.isBinary) {
+        if (result.headers) {
+          const contentType = result.headers['content-type'];
+          const contentDisposition = result.headers['content-disposition'];
+          if (contentType) res.setHeader('Content-Type', contentType);
+          if (contentDisposition) res.setHeader('Content-Disposition', contentDisposition);
+        }
+
+        const buffer = Buffer.isBuffer(result.data)
+          ? result.data
+          : Buffer.from(result.data);
+
+        res.status(result.status).send(buffer);
+        return;
+      }
+
       res.status(result.status).json(result.data);
     } catch (error) {
       if (error instanceof HttpException) {

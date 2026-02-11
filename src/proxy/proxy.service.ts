@@ -32,6 +32,9 @@ export class ProxyService {
 
       this.logger.debug(`Forwarding ${method} ${url}`);
 
+      const acceptHeader = headers['accept'] || '';
+      const isPdfRequest = path.endsWith('/pdf') || acceptHeader.includes('application/pdf');
+
       // Prepare request config
       const config: AxiosRequestConfig = {
         method: method.toLowerCase() as any,
@@ -43,6 +46,7 @@ export class ProxyService {
         },
         params: query,
         timeout: 30000, // 30s timeout
+        responseType: isPdfRequest ? 'arraybuffer' : 'json',
         validateStatus: (status) => {
           // Accept 2xx, 3xx (including 304) as valid responses
           return status >= 200 && status < 400;
@@ -66,6 +70,7 @@ export class ProxyService {
         data: response.data,
         status: response.status,
         headers: response.headers,
+        isBinary: isPdfRequest,
       };
     } catch (error) {
       this.logger.error(
